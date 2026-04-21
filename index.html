@@ -91,9 +91,6 @@
         <div id="active-task" class="log-line"></div>
     </div>
 
-    <!-- Unsichtbarer Download-Link -->
-    <a id="fakeDownload" href="data:text/plain;charset=utf-8,Du%20wurdest%20gehackt!%0A%0ADas%20ist%20nur%20ein%20Scherz%20:)%0AHier%20ist%20kein%20echter%20Virus." download="Trojaner_Virus.txt" style="display: none;"></a>
-
     <script>
         // --- 1. MATRIX REGEN EFFEKT ---
         const canvas = document.getElementById('matrix');
@@ -136,8 +133,8 @@
         });
 
 
-        // --- 2. LOGIK FÜR SCHREIBEFFEKT, DOWNLOAD & LÖSCHEN ---
-        const textToType = "Lade Virus-Payload herunter...";
+        // --- 2. LOGIK FÜR SCHREIBEFFEKT & LÖSCHEN ---
+        const textToType = "Initialisiere Schadcode...";
         const typingElement = document.getElementById('typing');
         const activeTaskElement = document.getElementById('active-task');
         const logsContainer = document.getElementById('logs');
@@ -160,13 +157,23 @@
                 setTimeout(typeWriter, 50);
             } else {
                 setTimeout(() => {
-                    simulateProgress("Download-Status", 150, true);
+                    const newLine = document.createElement('div');
+                    newLine.className = "log-line success";
+                    newLine.innerHTML = `> Initialisiere Schadcode... OK`;
+                    logsContainer.appendChild(newLine);
+                    
+                    // Cursor und Tipp-Zeile ausblenden
+                    document.getElementById('cursor').style.display = "none";
+                    typingElement.parentElement.style.display = "none";
+                    
+                    // Direkt mit dem "Löschen" anfangen
+                    setTimeout(startDeletionProcess, 500);
                 }, 500);
             }
         }
 
         // Generische Funktion für einen Ladebalken
-        function simulateProgress(label, speed, isDownload = false) {
+        function simulateProgress(label, speed) {
             let percent = 0;
             const width = 20;
             
@@ -185,45 +192,28 @@
                 
                 if (percent === 100) {
                     setTimeout(() => {
-                        finalizeTask(label, isDownload);
+                        finalizeTask(label);
                     }, 500);
                 }
             }, speed);
         }
 
         // Wird aufgerufen wenn ein Ladebalken 100% erreicht
-        function finalizeTask(label, isDownload) {
-            // Text als festen Logeintrag übernehmen
+        function finalizeTask(label) {
             const newLine = document.createElement('div');
+            newLine.className = "log-line error";
+            newLine.innerHTML = `> ${label} [ERLEDIGT]`;
+            logsContainer.appendChild(newLine);
             
-            if (isDownload) {
-                newLine.className = "log-line success";
-                newLine.innerHTML = `> ${label}: [====================] 100% - OK`;
-                logsContainer.appendChild(newLine);
-                
-                // Cursor ausblenden
-                document.getElementById('cursor').style.display = "none";
-                
-                // Fake Download auslösen
-                document.getElementById('fakeDownload').click();
-                
-                // Kurze Pause, dann Löschvorgang starten
-                setTimeout(startDeletionProcess, 1000);
-            } else {
-                newLine.className = "log-line error";
-                newLine.innerHTML = `> ${label} [ERLEDIGT]`;
-                logsContainer.appendChild(newLine);
-                
-                targetIndex++;
-                setTimeout(startDeletionProcess, 500);
-            }
+            targetIndex++;
+            setTimeout(startDeletionProcess, 500);
         }
 
         // Startet das Löschen der verschiedenen Kategorien
         function startDeletionProcess() {
             if (targetIndex < deleteTargets.length) {
                 activeTaskElement.innerHTML = "";
-                simulateProgress(deleteTargets[targetIndex], 80, false);
+                simulateProgress(deleteTargets[targetIndex], 80);
             } else {
                 // Wenn alles "gelöscht" ist
                 activeTaskElement.innerHTML = "";
